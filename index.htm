@@ -1,0 +1,104 @@
+<html>
+<!--
+ /**
+ * index htm is a demo file to  work with a sample API file to be called via AJAX to 
+ * deliver the contents of 2 JSON files, one of which display the 
+ * cat adoption, the other by dog adoption.
+ *
+ * The api page can be called via AJAX either via GET or POST, using a variable 
+ * named "spec" :
+ *
+ * <code>
+ * api.php?spec=cat
+ * </code>
+ *
+ * In the example above, the parameter spec is loaded with the string "cat" 
+ * which will indicate to the API to load the JSON file containing 
+ * cat species results.
+ *
+ * For troubleshooting, swap out the bondJSON() function with toConsole() 
+ * to examine the raw data returned
+ *
+ * @package pets-adoption-web-service
+ * @author Josh Lin
+ * @version 1.00 2015/02/22
+ * @link https://github.com/joshlin/pets-adoption-web-service
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @see api.php
+ * @todo none
+ */
+-->
+<head>
+<title>Pets Adoption Web Service Demo</title>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection" />    
+<script src="http://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {  
+
+	var today = new Date();
+    // Add copyright year
+    $("#thisYear").text(today.getFullYear());
+
+	$('.category').click(function(e){		
+        e.preventDefault(); //stop default action of the link
+		spec = $(this).attr("href");  //get category from URL		
+		loadAJAX(spec);  //load AJAX and parse JSON file
+	});
+});	
+
+
+function loadAJAX(spec)
+{
+	$.ajax({  
+		type: "GET",
+		dataType: "json",  
+		url: "api.php?spec=" + spec,
+		success: bondJSON,
+	});
+
+	$('#pets').html('');//clear data
+}
+
+function toConsole(data)
+{//return data to console for JSON examination
+	console.log("data: " + data); //to view,use Chrome console, ctrl + shift + j
+}
+
+function bondJSON(data){	
+	// $('#output').text(JSON.stringify(data));  //uncomment to view raw output
+	var header = data.title;
+	$('#petTitle').html(header);	
+	$.each(data.pets, function(i,item){
+		var text = '<b>Name</b>: ' + item.Name + '<br />';
+		text += '<div class="pet_pic"><img width="200px" height="225px" src="images/' + item.Image + '" /></div>';
+		text += '<b>Breed</b>: ' + item.Breed + '<br />';
+		text += '<b>Age</b>: ' + item.Age + '<br />';
+		text += '<b>Sex</b>: ' + item.Sex + '<br />';
+		text += '<b>Size</b>: ' + item.Size + '<br />';
+		text += '<b>Zipcode</b>: ' + item.Zipcode + '<br />';
+		text += '<b>Description</b>: <div class="description">' + item.Description + '</div><br />';		
+		$('<div class="pet_record"></div>').html(text).appendTo('#pets');  
+	});	
+}
+
+</script>
+</head>
+	<body>
+	<div id="wrapper" class="box">
+	<h1>Pet Adoption Web Service Demo</h1><br>
+		<a href="cat" class="category">Adopt Pets by Cat</a><br><br>
+		<a href="dog" class="category">Adopt Pets by Dog</a><br><br>
+		<a href="all" class="category">Adopt Pets by All</a>
+	</div>			
+    <div id="results" class="box">
+    	<h3 id="petTitle">Results Will Display Here</h3>
+    	<div id="output"></div>
+    	<div id="pets"></div>		
+	</div>
+	<footer id="footer" class="clear" >
+		&copy; <span id="thisYear"></span>, All Rights Reserved by Josh Lin
+</footer>
+	</body>
+</html>
